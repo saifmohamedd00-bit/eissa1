@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eissa Store - Portfolio</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; background: #050505; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
+        canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; pointer-events: none; }
+        
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 18px 8%;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(5, 5, 5, 0.6);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 255, 204, 0.15);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .rocket-icon {
+            width: 45px;
+            height: 45px;
+            animation: floatRocket 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 10px #00ffcc);
+        }
+
+        @keyframes floatRocket {
+            0%, 100% { transform: translateY(0) rotate(-45deg); }
+            50% { transform: translateY(-6px) rotate(-45deg); }
+        }
+
+        .logo-text-group { display: flex; flex-direction: column; }
+        .logo-text { font-size: 26px; font-weight: 800; color: #fff; text-shadow: 0 0 12px rgba(0, 255, 204, 0.6); }
+        .logo-subtext { font-size: 12px; color: #00ffcc; font-weight: 600; }
+
+        /* Info Menu Icon (3 Lines) */
+        .menu-btn {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 35px;
+            height: 28px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            z-index: 20;
+            padding: 0;
+        }
+
+        .menu-btn span {
+            width: 100%;
+            height: 3px;
+            background: #00ffcc;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 8px rgba(0, 255, 204, 0.6);
+        }
+
+        /* Sidebar / Drawer Navigation */
+        .sidebar-drawer {
+            position: fixed;
+            top: 0;
+            left: -350px;
+            width: 320px;
+            height: 100vh;
+            background: rgba(8, 12, 20, 0.95);
+            backdrop-filter: blur(15px);
+            border-right: 1px solid rgba(0, 255, 204, 0.3);
+            z-index: 15;
+            padding: 100px 25px 30px 25px;
+            transition: left 0.4s ease;
+            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        .sidebar-drawer.open {
+            left: 0;
+        }
+
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 14;
+            display: none;
+        }
+
+        .drawer-overlay.active {
+            display: block;
+        }
+
+        .menu-item {
+            background: rgba(0, 255, 204, 0.05);
+            border: 1px solid rgba(0, 255, 204, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .menu-item:hover {
+            border-color: #00ffcc;
+            background: rgba(0, 255, 204, 0.1);
+        }
+
+        .menu-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #00ffcc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .contact-details, .message-box-container {
+            display: none;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 15px;
+            color: #ddd;
+            line-height: 1.8;
+        }
+
+        .contact-details.active, .message-box-container.active {
+            display: block;
+        }
+
+        /* Message Form Fields */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            color: #00ffcc;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            border-radius: 8px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: #00ffcc;
+            box-shadow: 0 0 8px rgba(0, 255, 204, 0.4);
+        }
+
+        .send-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #00ffcc, #0077ff);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 12px rgba(0, 255, 204, 0.6);
+        }
+
+        .security-badge {
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(0, 255, 204, 0.1), rgba(230, 0, 255, 0.1));
+            border: 1px solid #e600ff;
+            box-shadow: 0 0 15px rgba(230, 0, 255, 0.2);
+        }
+
+        .security-badge p {
+            margin: 0;
+            background: linear-gradient(45deg, #00ffcc, #e600ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .main-container {
+            position: relative;
+            z-index: 2;
+            padding: 120px 6% 60px 6%;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Hero Header Section */
+        .hero-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 35px;
+            background: rgba(10, 15, 25, 0.75);
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            border-radius: 16px;
+            padding: 35px 45px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.1);
+        }
+
+        .hero h1 { 
+            font-size: 70px; 
+            margin: 0; 
+            background: linear-gradient(-45deg, #00ffcc, #0077ff, #e600ff, #00ffcc);
+            background-size: 300% 300%;
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            animation: gradientPulse 6s ease infinite;
+            filter: drop-shadow(0 0 22px rgba(0, 255, 204, 0.45));
+        }
+
+        @keyframes gradientPulse {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .hero p { font-size: 22px; color: #00ffcc; letter-spacing: 1px; margin-top: 8px; }
+
+        .sidebar-pills { display: flex; gap: 15px; flex-wrap: wrap; }
+        .tech-item { display: flex; align-items: center; gap: 10px; font-size: 18px; color: #aaa; background: rgba(0,0,0,0.6); padding: 10px 20px; border-radius: 20px; border: 1px solid #00ffcc33; }
+        .tech-item .number { color: #00ffcc; font-weight: bold; font-family: monospace; }
+
+        /* Grid Layout for Cards */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+
+        .card { 
+            background: rgba(10, 15, 25, 0.85); 
+            border: 1px solid #00ffcc44; 
+            border-radius: 16px; 
+            padding: 35px; 
+            backdrop-filter: blur(6px); 
+            box-shadow: 0 0 18px rgba(0, 255, 204, 0.1);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: #00ffcc;
+        }
+
+        .card.full-width { grid-column: span 2; }
+        .card h2 { color: #00ffcc; font-size: 28px; margin-top: 0; margin-bottom: 20px; }
+        .card p { font-size: 18px; line-height: 1.8; color: #ddd; }
+        
+        .contact-info { list-style: none; padding: 0; font-size: 20px; color: #fff; margin: 0; }
+        .contact-info li { margin-bottom: 15px; display: flex; align-items: center; gap: 12px; }
+        .contact-info span { color: #00ffcc; }
+
+        /* Setup Animation (PC + Laptop + Developer) */
+        .dev-scene {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 20px;
+            height: 170px;
+            margin: 25px 0;
+            position: relative;
+        }
+
+        /* PC Display */
+        .pc-monitor {
+            width: 140px;
+            height: 95px;
+            background: #111;
+            border: 2px solid #00ffcc;
+            border-radius: 6px;
+            position: relative;
+            box-shadow: 0 0 12px rgba(0,255,204,0.25);
+        }
+        .pc-stand {
+            width: 35px;
+            height: 15px;
+            background: #222;
+            margin: 0 auto;
+            border: 1px solid #00ffcc;
+            border-top: none;
+        }
+        .pc-base {
+            width: 70px;
+            height: 6px;
+            background: #00ffcc;
+            margin: 0 auto;
+            border-radius: 3px;
+        }
+
+        /* AI Developer Avatar */
+        .ai-dev {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+        .ai-head {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #00ffcc, #0077ff);
+            border-radius: 50%;
+            box-shadow: 0 0 12px #00ffcc;
+            position: relative;
+            animation: pulseHead 2s infinite alternate;
+        }
+        @keyframes pulseHead {
+            0% { box-shadow: 0 0 8px #00ffcc; }
+            100% { box-shadow: 0 0 20px #e600ff; }
+        }
+        .ai-body {
+            width: 48px;
+            height: 42px;
+            background: #151525;
+            border: 1px solid #00ffcc;
+            border-radius: 10px 10px 0 0;
+            margin-top: 4px;
+        }
+
+        /* Laptop */
+        .laptop-device {
+            width: 110px;
+            height: 70px;
+            background: #111;
+            border: 2px solid #e600ff;
+            border-radius: 6px 6px 0 0;
+            position: relative;
+            box-shadow: 0 0 12px rgba(230,0,255,0.25);
+        }
+        .laptop-base {
+            width: 130px;
+            height: 6px;
+            background: #e600ff;
+            border-radius: 0 0 4px 4px;
+        }
+
+        /* Screen Glow Lines */
+        .screen-glitch {
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .glitch-line {
+            height: 3px;
+            border-radius: 2px;
+            animation: codeRun 0.8s infinite alternate;
+        }
+        .c-cyan { background: #00ffcc; }
+        .c-pink { background: #e600ff; }
+        .c-blue { background: #0077ff; }
+
+        @keyframes codeRun {
+            0% { width: 20%; opacity: 0.3; }
+            100% { width: 90%; opacity: 1; }
+        }
+
+        .footer-logo-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 24px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid #00ffcc;
+            border-radius: 25px;
+            margin-top: 15px;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
+        }
+
+        /* Interactive Click Box Section */
+        .click-section {
+            grid-column: span 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .click-box {
+            width: 180px;
+            height: 70px;
+            background: rgba(10, 15, 25, 0.9);
+            border: 2px solid #00ffcc;
+            border-radius: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .click-box:hover {
+            transform: scale(1.05);
+            border-color: #ff0055;
+            box-shadow: 0 0 25px rgba(255, 0, 85, 0.5);
+        }
+
+        .click-text {
+            font-size: 22px;
+            font-weight: bold;
+            color: #00ffcc;
+            letter-spacing: 2px;
+            transition: opacity 0.3s ease;
+        }
+
+        .heart-container {
+            display: none;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .heart-shape {
+            width: 80px;
+            height: 80px;
+            background-color: #ff0044;
+            position: relative;
+            transform: rotate(-45deg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(255, 0, 68, 0.8);
+            animation: pulseHeart 1.2s infinite ease-in-out;
+        }
+
+        .heart-shape::before,
+        .heart-shape::after {
+            content: "";
+            width: 80px;
+            height: 80px;
+            background-color: #ff0044;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .heart-shape::before {
+            top: -40px;
+            left: 0;
+        }
+
+        .heart-shape::after {
+            left: 40px;
+            top: 0;
+        }
+
+        .heart-text {
+            position: absolute;
+            z-index: 5;
+            transform: rotate(45deg);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 800;
+            white-space: nowrap;
+            text-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes pulseHeart {
+            0%, 100% { transform: scale(1) rotate(-45deg); }
+            50% { transform: scale(1.1) rotate(-45deg); }
+        }
+
+        .click-box.opened {
+            width: 200px;
+            height: 180px;
+            background: rgba(15, 5, 12, 0.95);
+            border-color: #ff0044;
+            box-shadow: 0 0 30px rgba(255, 0, 68, 0.5);
+            border-radius: 20px;
+        }
+
+        @media (max-width: 950px) {
+            .grid-container { grid-template-columns: 1fr; }
+            .card.full-width, .click-section { grid-column: span 1; }
+            .hero-banner { flex-direction: column; align-items: flex-start; gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bgCanvas"></canvas>
+
+    <header>
+        <div class="logo-container">
+            <svg class="rocket-icon" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2.5C12 2.5 17 6 17 12C17 15.5 15 18.5 15 18.5L12 16.5L9 18.5C9 18.5 7 15.5 7 12C7 6 12 2.5 12 2.5Z" stroke="#00ffcc" stroke-width="2"/>
+                <path d="M12 11C12.8284 11 13.5 10.3284 13.5 9.5C13.5 8.67157 12.8284 8 12 8C11.1716 8 10.5 8.67157 10.5 9.5C10.5 10.3284 11.1716 11 12 11Z" fill="#00ffcc"/>
+                <path d="M12 16.5V21.5" stroke="#e600ff" stroke-width="2"/>
+            </svg>
+            <div class="logo-text-group">
+                <span class="logo-text">Eissa Store</span>
+                <span class="logo-subtext">أأمن وأفضل موقع، ولن تندم!</span>
+            </div>
+        </div>
+
+        <!-- Info 3-Lines Menu Icon on Left -->
+        <button class="menu-btn" id="menuBtn" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </header>
+
+    <!-- Overlay & Drawer Side Menu -->
+    <div class="drawer-overlay" id="overlay" onclick="toggleMenu()"></div>
+    <div class="sidebar-drawer" id="drawer">
+        <!-- Contact Methods Category -->
+        <div class="menu-item" onclick="toggleContact()">
+            <div class="menu-title">
+                <span>طرق التواصل</span>
+                <span id="arrow">▼</span>
+            </div>
+            <div class="contact-details" id="contactDetails">
+                <p>📞 هاتف: 01015471570</p>
+                <p>💬 واتساب: 01015471570</p>
+                <p>📧 بريد: saif.mohamed@gmail.com</p>
+            </div>
+        </div>
+
+        <!-- Send Message Category -->
+        <div class="menu-item" onclick="toggleMessageBox()">
+            <div class="menu-title">
+                <span>إرسال الرسالة</span>
+                <span id="msgArrow">▼</span>
+            </div>
+            <div class="message-box-container" id="messageBoxContainer" onclick="event.stopPropagation();">
+                <div class="form-group">
+                    <label>طريقة التواصل:</label>
+                    <select class="form-select" id="contactMethod">
+                        <option value="whatsapp">واتساب (WhatsApp)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>تفاصيل الرسالة:</label>
+                    <textarea class="form-textarea" id="userMessage" rows="4" placeholder="اكتب التفاصيل التي تريدها هنا..."></textarea>
+                </div>
+                <button class="send-btn" onclick="sendMessage()">إرسال الرسالة</button>
+            </div>
+        </div>
+
+        <div class="menu-item security-badge">
+            <p>لا تقلق، أنت في أمان مع Eissa Store</p>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <!-- Banner Section -->
+        <div class="hero-banner">
+            <div class="hero">
+                <h1>Eissa Mohamed</h1>
+                <p>&lt; Developer & System Architect /&gt;</p>
+            </div>
+            <div class="sidebar-pills">
+                <div class="tech-item"><span class="number">0.1</span> System Online</div>
+                <div class="tech-item"><span class="number">1.0</span> Active Nodes</div>
+                <div class="tech-item"><span class="number">0.9</span> Database Live</div>
+            </div>
+        </div>
+
+        <!-- Grid Layout for Cards -->
+        <div class="grid-container">
+            
+            <!-- AI Developer Workspace Box -->
+            <div class="card full-width" style="text-align: center;">
+                <h2>سرعة وأداء البرمجة الحديثة</h2>
+                <div class="dev-scene">
+                    <!-- PC Monitor -->
+                    <div>
+                        <div class="pc-monitor">
+                            <div class="screen-glitch">
+                                <div class="glitch-line c-cyan" style="animation-delay: 0.1s;"></div>
+                                <div class="glitch-line c-blue" style="animation-delay: 0.3s;"></div>
+                                <div class="glitch-line c-pink" style="animation-delay: 0.2s;"></div>
+                            </div>
+                        </div>
+                        <div class="pc-stand"></div>
+                        <div class="pc-base"></div>
+                    </div>
+
+                    <!-- AI Developer -->
+                    <div class="ai-dev">
+                        <div class="ai-head"></div>
+                        <div class="ai-body"></div>
+                    </div>
+
+                    <!-- Laptop Device -->
+                    <div>
+                        <div class="laptop-device">
+                            <div class="screen-glitch">
+                                <div class="glitch-line c-pink" style="animation-delay: 0.2s;"></div>
+                                <div class="glitch-line c-cyan" style="animation-delay: 0.4s;"></div>
+                            </div>
+                        </div>
+                        <div class="laptop-base"></div>
+                    </div>
+                </div>
+
+                <!-- Eissa Store Rocket Logo -->
+                <div class="footer-logo-tag">
+                    <svg class="rocket-icon" style="width:24px; height:24px;" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2.5C12 2.5 17 6 17 12C17 15.5 15 18.5 15 18.5L12 16.5L9 18.5C9 18.5 7 15.5 7 12C7 6 12 2.5 12 2.5Z" stroke="#00ffcc" stroke-width="2"/>
+                        <path d="M12 11C12.8284 11 13.5 10.3284 13.5 9.5C13.5 8.67157 12.8284 8 12 8C11.1716 8 10.5 8.67157 10.5 9.5C10.5 10.3284 11.1716 11 12 11Z" fill="#00ffcc"/>
+                    </svg>
+                    <span style="font-weight: bold; color: #fff; font-size: 18px; text-shadow: 0 0 8px rgba(0,255,204,0.5);">Eissa Store</span>
+                </div>
+                <p style="margin-top: 15px; font-size: 17px;">موقعك يُبنى بأقصى سرعة وأعلى جودة لجلب الآلاف من الزبائن لمشروعك.</p>
+            </div>
+
+            <!-- Contact Box -->
+            <div class="card">
+                <h2>معلومات التواصل</h2>
+                <ul class="contact-info">
+                    <li><span>📞</span> رقم الهاتف: 01015471570</li>
+                    <li><span>💬</span> واتساب: 01015471570</li>
+                    <li><span>📧</span> البريد الإلكتروني: saif.mohamed@gmail.com</li>
+                </ul>
+            </div>
+
+            <!-- Services Box -->
+            <div class="card">
+                <h2>المشاريع والخدمات</h2>
+                <p>أقوم بتصميم وتطوير مواقع إلكترونية احترافية ومتكاملة بأعلى معايير الأداء والأمان.</p>
+                <p style="color: #00ffcc; font-weight: bold; margin-top: 10px;">سعر الموقع يبدأ من 700 جنيه، وقد يزيد أو ينقص بناءً على متطلبات المشروع وتفاصيله.</p>
+            </div>
+
+            <!-- Clickable Heart Box Below Services & Contacts -->
+            <div class="click-section">
+                <div class="click-box" id="clickBox" onclick="openHeartBox()">
+                    <span class="click-text" id="clickText">Click</span>
+                    <div class="heart-container" id="heartContainer">
+                        <div class="heart-shape">
+                            <span class="heart-text">Eissa Store</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById('drawer').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
+        function toggleContact() {
+            const details = document.getElementById('contactDetails');
+            const arrow = document.getElementById('arrow');
+            details.classList.toggle('active');
+            arrow.textContent = details.classList.contains('active') ? '▲' : '▼';
+        }
+
+        function toggleMessageBox() {
+            const msgBox = document.getElementById('messageBoxContainer');
+            const msgArrow = document.getElementById('msgArrow');
+            msgBox.classList.toggle('active');
+            msgArrow.textContent = msgBox.classList.contains('active') ? '▲' : '▼';
+        }
+
+        function sendMessage() {
+            const text = document.getElementById('userMessage').value.trim();
+            if (!text) {
+                alert('يرجى كتابة الرسالة أولاً!');
+                return;
+            }
+            const encodedText = encodeURIComponent(text);
+            const whatsappNumber = '201015471570';
+            const url = `https://wa.me/${whatsappNumber}?text=${encodedText}`;
+            window.open(url, '_blank');
+        }
+
+        function openHeartBox() {
+            const box = document.getElementById('clickBox');
+            const text = document.getElementById('clickText');
+            const heart = document.getElementById('heartContainer');
+            
+            box.classList.add('opened');
+            text.style.display = 'none';
+            heart.style.display = 'flex';
+        }
+
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // Enhanced Colorful & Larger Stars
+        const starColors = ['#00ffcc', '#0077ff', '#e600ff', '#ffffff', '#ff00aa'];
+        let stars = Array.from({ length: 140 }, () => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 3 + 1.2,
+            color: starColors[Math.floor(Math.random() * starColors.length)],
+            speedX: (Math.random() - 0.5) * 0.4,
+            speedY: (Math.random() - 0.5) * 0.4,
+            opacity: Math.random() * 0.7 + 0.3
+        }));
+
+        const fontSize = 16;
+        const columns = Math.floor(window.innerWidth / fontSize);
+        const drops = Array(columns).fill(1);
+
+        function draw() {
+            ctx.fillStyle = 'rgba(5, 5, 5, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Colorful Stars with Glow
+            stars.forEach(star => {
+                star.x += star.speedX;
+                star.y += star.speedY;
+                if (star.x < 0 || star.x > canvas.width) star.speedX *= -1;
+                if (star.y < 0 || star.y > canvas.height) star.speedY *= -1;
+
+                ctx.save();
+                ctx.fillStyle = star.color;
+                ctx.globalAlpha = star.opacity;
+                ctx.shadowColor = star.color;
+                ctx.shadowBlur = 8;
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            });
+
+            // Matrix Binary Rain
+            ctx.fillStyle = '#00ff66';
+            ctx.font = fontSize + 'px monospace';
+            for (let i = 0; i < drops.length; i++) {
+                const text = Math.random() > 0.5 ? '1' : '0';
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+
+            requestAnimationFrame(draw);
+        }
+
+        draw();
+    </script>
+</body>
+</html>
